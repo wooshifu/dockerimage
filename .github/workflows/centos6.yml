@@ -1,0 +1,30 @@
+name: build docker image
+
+on: [ push, pull_request ]
+
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        centos: ["6.6", "6.7", "6.8", "6.9", "6.10"]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - name: export docker image centos ${{ matrix.centos }}
+        shell: bash
+        run: |
+          docker pull centos:${{ matrix.centos }}
+          docker save -o centos_${{ matrix.centos }}.tar centos:${{ matrix.centos }}
+          mkdir ~/docker6
+          mv centos_${{ matrix.centos }}.tar ~/docker6
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: docker
+          path: |
+            ~/docker6/*
+          if-no-files-found: error

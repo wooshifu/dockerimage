@@ -1,0 +1,30 @@
+name: build docker image
+
+on: [ push, pull_request ]
+
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        centos: ["centos7.0.1406", "centos7.1.1503", "centos7.2.1511", "centos7.3.1611", "centos7.4.1708", "centos7.5.1804", "centos7.6.1810", "centos7.7.1908", "centos7.8.2003", "centos7.9.2009"]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - name: export docker image centos ${{ matrix.centos }}
+        shell: bash
+        run: |
+          docker pull centos:${{ matrix.centos }}
+          docker save -o centos_${{ matrix.centos }}.tar centos:${{ matrix.centos }}
+          mkdir ~/docker7
+          mv centos_${{ matrix.centos }}.tar ~/docker7
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: docker
+          path: |
+            ~/docker7/*
+          if-no-files-found: error
