@@ -16,12 +16,12 @@ jobs:
         run: |
           docker pull centos:6.6
           docker save -o centos:6.6.tar centos:6.6
-          mkdir /docker
+          mkdir ~/docker
           mv centos:6.6.tar /docker
 
       - uses: actions/upload-artifact@v2
         with:
           name: docker
           path: |
-            /docker/*
+            ~/docker/*
           if-no-files-found: error
