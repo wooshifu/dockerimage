@@ -1,0 +1,27 @@
+name: build docker image
+
+on: [ push, pull_request ]
+
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - name: export docker image
+        shell: bash
+        run: |
+          docker pull centos:6.6
+          docker save -o centos:6.6.tar centos:6.6
+          mkdir /docker
+          mv centos:6.6.tar /docker
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: docker
+          path: |
+            /docker/*
+          if-no-files-found: error
