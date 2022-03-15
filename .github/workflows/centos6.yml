@@ -14,7 +14,7 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: export docker image centos ${{ matrix.centos }}
+      - name: export docker image centos 6
         shell: bash
         run: |
           docker pull centos:${{ matrix.centos }}
