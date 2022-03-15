@@ -1,0 +1,30 @@
+name: build docker image
+
+on: [ push, pull_request ]
+
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        centos: ["centos8.1.1911", "centos8.2.2004", "centos8.3.2011", "centos8.4.2105"]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - name: export docker image centos ${{ matrix.centos }}
+        shell: bash
+        run: |
+          docker pull centos:${{ matrix.centos }}
+          docker save -o centos_${{ matrix.centos }}.tar centos:${{ matrix.centos }}
+          mkdir ~/docker8
+          mv centos_${{ matrix.centos }}.tar ~/docker8
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: docker
+          path: |
+            ~/docker8/*
+          if-no-files-found: error
