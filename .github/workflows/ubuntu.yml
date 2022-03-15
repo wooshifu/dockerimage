@@ -1,0 +1,30 @@
+name: build docker image
+
+on: [ push, pull_request ]
+
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        ubuntu: ["12.04", "12.10", "14.04", "14.10", "16.04", "16.10", "18.04", "18.10", "20.04", "20.10"]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+
+      - name: export docker image centos 7
+        shell: bash
+        run: |
+          docker pull ubuntu:${{ matrix.ubuntu }}
+          docker save -o ubuntu_${{ matrix.ubuntu }}.tar ubuntu:${{ matrix.ubuntu }}
+          mkdir ~/ubuntu
+          mv ubuntu_${{ matrix.ubuntu }}.tar ~/ubuntu
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: docker
+          path: |
+            ~/ubuntu/*
+          if-no-files-found: error
